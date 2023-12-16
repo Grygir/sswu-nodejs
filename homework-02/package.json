@@ -1,0 +1,18 @@
+{
+  "name": "simple-calc",
+  "version": "1.0.0",
+  "description": "SSWU homework 2",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test --experimental-test-coverage ./test/**.js",
+    "test:watch": "node --test --watch --experimental-test-coverage ./test/**.js"
+  },
+  "bin": {
+    "calc": "cli.js"
+  },
+  "author": "Hryhorii Hrebiniuk",
+  "type": "module",
+  "devDependencies": {
+    "execa": "^8.0.1"
+  }
+}
