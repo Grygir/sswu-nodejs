@@ -1,0 +1,20 @@
+extends layout
+
+block content
+    h1= title
+    ul
+    each resource in resources
+        li(class="resource-item")
+            if resource.isDirectory
+                a(href=resource.link class="resource-link")
+                    span(class="resource-icon") !{resource.name === '../' ? '&#x1F4C2': '&#x1F4C1'};
+                    =resource.name
+            else if resource.isFile
+                a(href=resource.link class="resource-link")
+                    span(class="resource-icon") &#x1F4C4;
+                    =resource.name
+                a(href=resource.link + '?download' title="Download" class="resource-extra") &#x1F53D;
+                if resource.isScript
+                    a(href=resource.link + '?raw' title="Source code" class="resource-extra") &#x1F524;
+            else
+                =resource.name
