@@ -1,0 +1,11 @@
+{
+  "name": "text-util",
+  "version": "1.0.0",
+  "description": "SSWU homework 4",
+  "main": "index.js",
+  "bin": {
+    "calc": "cli.js"
+  },
+  "author": "Hryhorii Hrebiniuk",
+  "type": "module"
+}
