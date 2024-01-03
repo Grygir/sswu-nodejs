@@ -1,31 +1,49 @@
-import stream from "stream";
-
-const wordsRegexp = /(?<![\u0400-\u04ff])(([\u0400-\u04ff\w]+'[\u0400-\u04ff\w]+)|([\u0400-\u04ff\w]+-[\u0400-\u04ff\w]+)|[\u0400-\u04ff\w]+)(?![\u0400-\u04ff])/g;
+import stream from 'stream';
+import {StringDecoder} from 'string_decoder';
 
 /**
  * Collects statistics from stream of sentences
  */
 class TextAnalyzerStream extends stream.Writable {
+    DEFAULT_ENCODING = 'utf8';
+
     constructor(opts = {}) {
         super(opts);
+        const {encoding = this.DEFAULT_ENCODING} = opts;
+        this._decoder = new StringDecoder(encoding);
+        this._remnant = '';
         this._stats = {
-            sentences: 0,
-            words: 0,
-            letters: 0,
-            whiteSpaces: 0,
             characters: 0,
-            noLetters: 0
+            words: 0,
+            whiteSpaces: 0
         };
     }
 
     _write(chunk, encoding, cb) {
-        const sentence = chunk.toString();
-        this._stats.sentences++;
-        this._stats.words += Array.from(sentence.matchAll(wordsRegexp)).length;
-        this._stats.characters += sentence.length;
-        this._stats.whiteSpaces += sentence.replaceAll(/\S/gm, '').length;
-        this._stats.noLetters += sentence.replaceAll(/[\u0400-\u04ff\w\s]/gm, '').length;
-        this._stats.letters = this._stats.characters - this._stats.whiteSpaces - this._stats.noLetters;
+        let text;
+        this._remnant += this._decoder.write(chunk);
+        const lastSpaceIndex = this._remnant.lastIndexOf(' ');
+        if (lastSpaceIndex !== -1) {
+            text = this._remnant.slice(0, lastSpaceIndex);
+            this._remnant = this._remnant.slice(lastSpaceIndex);
+        } else {
+            text = this._remnant;
+            this._remnant = '';
+        }
+        this._gatherStatistic(text);
+        cb();
+    }
+
+    _gatherStatistic(text) {
+        this._stats.characters += text.length;
+        const parts = text.split(/\s/);
+        this._stats.words += parts.filter(part => part && part.match(/[\u0400-\u04ff\w]/)).length;
+        this._stats.whiteSpaces += parts.length - 1;
+    }
+
+    _final(cb) {
+        this._gatherStatistic(this._remnant);
+        this._remnant = '';
         cb();
     }
 

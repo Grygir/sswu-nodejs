@@ -4,7 +4,6 @@ import {readFile} from 'fs/promises';
 import fs from 'fs';
 import path from 'path';
 import SentencesStream from './src/sentences-stream.js'
-import SentencesTransformStream from './src/sentences-transform-stream.js'
 import TextAnalyzerStream from './src/text-analyzer-stream.js'
 
 process.on('uncaughtException', err => {
@@ -52,21 +51,16 @@ switch (command) {
     case 'analyze':
         const [textFile = './output/text.txt'] = args;
         const readStream = fs.createReadStream(path.resolve(textFile));
-        const sentencesTransformStream = new SentencesTransformStream();
         const textAnalyzerStream = new TextAnalyzerStream();
         readStream
             .on('error', err => {
                 throw new Error(`Cannot open file "${textFile}" for analysis, pleas check if the file exists and has proper permissions`);
             })
-            .pipe(sentencesTransformStream)
             .pipe(textAnalyzerStream)
             .on('finish', () => {
                 const stats = textAnalyzerStream.getStats();
-                console.log(`Sentences: ${stats.sentences},
-Words: ${stats.words},
+                console.log(`Words: ${stats.words},
 Total characters: ${stats.characters},
-Letters: ${stats.letters},
-Non letters: ${stats.noLetters},
 White spaces: ${stats.whiteSpaces}`);
             });
         break;

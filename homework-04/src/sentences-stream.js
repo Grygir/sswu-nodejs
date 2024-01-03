@@ -1,4 +1,5 @@
-import stream from "stream";
+import stream from 'stream';
+import {StringDecoder} from 'string_decoder';
 
 /**
  * Generates stream of random sentences from provided sentences list until certain text length is reached
@@ -20,7 +21,14 @@ class SentencesStream extends stream.Readable {
     _read(size) {
         if (this.written < this.textSizeThreshold) {
             const sentence = this.sentences[Math.floor(Math.random() * this.sentences.length)];
-            const buffer = Buffer.from(sentence + ' ');
+            let buffer = Buffer.from((this.written ? ' ' : '') + sentence.trim());
+            const bytesLeftToWrite = this.textSizeThreshold - this.written;
+            if (buffer.length > bytesLeftToWrite) {
+                const decoder = new StringDecoder('utf8');
+                const bufferChunk = buffer.subarray(0, bytesLeftToWrite);
+                const stringChunk = decoder.write(bufferChunk);
+                buffer = Buffer.from(stringChunk);
+            }
             this.written += buffer.length;
             this.push(buffer);
         } else {
