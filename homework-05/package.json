@@ -1,0 +1,15 @@
+{
+  "name": "webserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "http.js",
+  "scripts": {
+    "start": "nodemon http.js"
+  },
+  "author": "Hryhorii Hrebiniuk",
+  "type": "module",
+  "dependencies": {
+    "nodemon": "^3.0.2",
+    "pug": "^3.0.2"
+  }
+}
