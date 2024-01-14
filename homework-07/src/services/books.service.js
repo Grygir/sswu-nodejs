@@ -1,11 +1,15 @@
 import fs from 'fs/promises';
 import crypto  from 'crypto';
+import * as booksValidator from "../utils/books.validator.js";
 
 /**
  * @typedef {Object} Book
  * @property {UUID} id
  * @property {string} title
  * @property {string} author
+ * @property {number} price not less than 1
+ * @property {number?} year has to be in range 1900 <= year <= 2100
+ * @property {string[]?} genres
  */
 
 /**
@@ -46,6 +50,8 @@ export const getBookById = async (bookId) => {
  * @returns {Promise<Book>}
  */
 export const createBook = async (data) => {
+    booksValidator.validateCreateData(data);
+
     /** @type {Book} */
     const book = {
         id: crypto.randomUUID(),
@@ -67,6 +73,8 @@ export const createBook = async (data) => {
  * @returns {Promise<Book|undefined>}
  */
 export const updateBook = async (bookId, data) => {
+    booksValidator.validateUpdateData(data);
+
     const {books} = await getFileContent();
     const book = books.find(book => book.id === bookId);
 

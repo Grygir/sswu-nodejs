@@ -3,12 +3,25 @@
     {
       "id": "708b8f84-bd94-447d-91ff-3c8339a15859",
       "title": "The Black Arrow",
-      "author": "Robert Louis Stevenson"
+      "author": "Robert Louis Stevenson",
+      "price": 49.99,
+      "year": 2024,
+      "genres": [
+        "Historical",
+        "Adventure",
+        "Romance novel"
+      ]
     },
     {
       "id": "708b8f84-bd94-447d-91ff-3c8339a15859",
       "title": "Treasure Island",
-      "author": "Robert Louis Stevenson"
+      "author": "Robert Louis Stevenson",
+      "price": 19.99,
+      "year": 2013,
+      "genres": [
+        "Adventure fiction",
+        "Young adult literature"
+      ]
     }
   ]
 }
