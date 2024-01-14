@@ -49,7 +49,7 @@ export const createBook = async (req, res, next) => {
     }
 
     res.location(`${req.baseUrl}/${book.id}`);
-    res.status(200).json(book);
+    res.status(201).json(book);
 };
 
 export const updateBook = async (req, res, next) => {
@@ -71,7 +71,6 @@ export const updateBook = async (req, res, next) => {
     }
 
     if (book) {
-        res.location(`${req.baseUrl}/${book.id}`);
         res.status(200).json(book);
     } else {
         res.sendStatus(404);
@@ -87,7 +86,7 @@ export const deleteBook = async  (req, res, next) => {
     }
 
     if (result) {
-        res.sendStatus(201);
+        res.sendStatus(204);
     } else {
         res.sendStatus(404);
     }
