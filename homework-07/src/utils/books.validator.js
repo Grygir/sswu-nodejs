@@ -42,6 +42,8 @@ export const validateCreateData = (data) => {
 
     if (genres !== undefined && (!Array.isArray(genres) || genres.some(genre => typeof genre !== 'string'))) {
         errors.push('Property "genres" should be an array of strings');
+    } else if (Array.isArray(genres) && genres.some((genre, i, arr) => arr.indexOf(genre) !== i)) {
+        errors.push('Property "genres" values should be unique');
     }
 
     // extra properties are not allowed
@@ -90,6 +92,8 @@ export const validateUpdateData = (data) => {
 
     if (genres !== null && genres && (!Array.isArray(genres) || genres.some(genre => typeof genre !== 'string'))) {
         errors.push('Property "genres" should be an array of strings');
+    } else if (Array.isArray(genres) && genres.some((genre, i, arr) => arr.indexOf(genre) !== i)) {
+        errors.push('Property "genres" values should be unique');
     }
 
     const keys = Object.keys(rest);

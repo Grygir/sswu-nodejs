@@ -1,0 +1,293 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Book Store API",
+    "description": "This is a Book Store API",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Book",
+      "description": "Books management API"
+    }
+  ],
+  "paths": {
+    "/api/books": {
+      "get": {
+        "tags": ["Book"],
+        "summary": "List of all Books",
+        "description": "Get list of all books",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "books": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Book"
+                      }
+                    },
+                    "booksCount": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Book"],
+        "summary": "Add a new book to the store",
+        "description": "Add a new book to the store",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewBook"
+                  },
+                  {
+                    "type": "object",
+                    "required": ["title", "author", "price"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/books/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the book",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Book"],
+        "summary": "Find book by id",
+        "description": "Returns a single book",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Book"],
+        "summary": "Update book by id",
+        "description": "Updates a book from the store",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Book.title"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Book.author"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Book.price"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Book.year"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Book.genres"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Book is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Book"],
+        "summary": "Delete book by id",
+        "description": "Deletes a book from the store",
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Book is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NewBook": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Book.title"
+          },
+          {
+            "$ref": "#/components/schemas/Book.author"
+          },
+          {
+            "$ref": "#/components/schemas/Book.price"
+          },
+          {
+            "$ref": "#/components/schemas/Book.year"
+          },
+          {
+            "$ref": "#/components/schemas/Book.genres"
+          }
+        ]
+      },
+      "Book": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/NewBook"
+          }
+        ]
+      },
+      "Book.title": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "The Black Arrow"
+          }
+        }
+      },
+      "Book.author": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "type": "string",
+            "example": "Robert Louis Stevenson"
+          }
+        }
+      },
+      "Book.price": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "minimum": 1,
+            "example": 49.99
+          }
+        }
+      },
+      "Book.year": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100,
+            "minimum": 1900,
+            "nullable": true,
+            "example": 2024
+          }
+        }
+      },
+      "Book.genres": {
+        "type": "object",
+        "properties": {
+          "genres": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "uniqueItems": true
+            },
+            "example": ["Historical", "Adventure", "Romance novel"]
+          }
+        }
+      }
+    }
+  }
+}

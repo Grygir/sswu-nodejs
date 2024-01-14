@@ -84,7 +84,7 @@ export const deleteBook = async  (req, res, next) => {
     }
 
     if (result) {
-        res.sendStatus(204);
+        res.status(204).send('Resource deleted successfully');
     } else {
         res.sendStatus(404);
     }

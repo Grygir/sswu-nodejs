@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import {getFileContent, setFileContent} from './books.storage.js';
 import crypto  from 'crypto';
 import * as booksValidator from "../utils/books.validator.js";
 
@@ -11,23 +11,6 @@ import * as booksValidator from "../utils/books.validator.js";
  * @property {number?} year has to be in range 1900 <= year <= 2100
  * @property {string[]?} genres
  */
-
-/**
- * @returns {Promise<{books: Book[]}>}
- */
-async function getFileContent() {
-    const  data = await fs.readFile('./books.json', {encoding: 'utf8'});
-    return JSON.parse(data);
-}
-
-/**
- * @param {{books: Book[]}} data
- * @returns {Promise<void>}
- */
-async function setFileContent(data) {
-    const content = JSON.stringify(data, null, "  ");
-    await fs.writeFile('./books.json', content, {encoding: 'utf8'});
-}
 
 /**
  * @returns {Promise<Book[]>}
@@ -79,7 +62,15 @@ export const updateBook = async (bookId, data) => {
     const book = books.find(book => book.id === bookId);
 
     if (book) {
-        Object.assign(book, data);
+        const entriesToUpdate = [];
+        Object.entries(data).forEach(([key, value]) => {
+            if (value === null) {
+                delete book[key];
+            } else {
+                entriesToUpdate.push([key, value]);
+            }
+        });
+        Object.assign(book, Object.fromEntries(entriesToUpdate));
         await setFileContent({books});
     }
 
