@@ -1,6 +1,5 @@
 import {getFileContent, setFileContent} from './books.storage.js';
 import crypto  from 'crypto';
-import * as booksValidator from "../utils/books.validator.js";
 
 /**
  * @typedef {Object} Book
@@ -33,8 +32,6 @@ export const getBookById = async (bookId) => {
  * @returns {Promise<Book>}
  */
 export const createBook = async (data) => {
-    booksValidator.validateCreateData(data);
-
     /** @type {Book} */
     const book = {
         id: crypto.randomUUID(),
@@ -56,8 +53,6 @@ export const createBook = async (data) => {
  * @returns {Promise<Book|undefined>}
  */
 export const updateBook = async (bookId, data) => {
-    booksValidator.validateUpdateData(data);
-
     const {books} = await getFileContent();
     const book = books.find(book => book.id === bookId);
 

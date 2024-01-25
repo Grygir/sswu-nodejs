@@ -239,7 +239,9 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "The Black Arrow"
+            "example": "The Black Arrow",
+            "minLength": 3,
+            "maxLength": 140
           }
         }
       },
@@ -248,7 +250,9 @@
         "properties": {
           "author": {
             "type": "string",
-            "example": "Robert Louis Stevenson"
+            "example": "Robert Louis Stevenson",
+            "minLength": 3,
+            "maxLength": 140
           }
         }
       },

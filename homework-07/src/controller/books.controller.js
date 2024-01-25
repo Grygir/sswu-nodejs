@@ -1,5 +1,4 @@
 import * as booksService from '../services/books.service.js';
-import {ValidationError} from "../utils/books.validator.js";
 
 export const getBooks = async (req, res, next) => {
     let books;
@@ -37,14 +36,7 @@ export const createBook = async (req, res, next) => {
     try {
         book = await booksService.createBook(data);
     } catch (err) {
-        if (err instanceof ValidationError) {
-            return res.status(400).json({
-                status: false,
-                errors: err.getErrors(),
-            });
-        } else {
-            return next(err);
-        }
+        return next(err);
     }
 
     res.location(`${req.baseUrl}/${book.id}`);
@@ -58,14 +50,7 @@ export const updateBook = async (req, res, next) => {
     try {
         book = await booksService.updateBook(req.params.id, data);
     } catch (err) {
-        if (err instanceof ValidationError) {
-            return res.status(400).json({
-                status: false,
-                errors: err.getErrors(),
-            });
-        } else {
-            return next(err);
-        }
+        return next(err);
     }
 
     if (book) {
@@ -84,9 +69,8 @@ export const deleteBook = async  (req, res, next) => {
     }
 
     if (result) {
-        res.status(204).send('Resource deleted successfully');
+        res.sendStatus(204);
     } else {
         res.sendStatus(404);
     }
-
 };
