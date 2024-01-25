@@ -12,4 +12,9 @@ Start server
 npm start
 ```
 
-Open browser [http://localhost:8080/](http://localhost:8080/)
+Run tests
+```shell
+npm test
+```
+
+See API documentation [http://localhost:8080/api-docs](http://localhost:8080/api-docs)

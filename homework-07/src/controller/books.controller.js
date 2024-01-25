@@ -1,5 +1,4 @@
 import * as booksService from '../services/books.service.js';
-import * as booksValidator from "../utils/books.validator.js";
 
 export const getBooks = async (req, res, next) => {
     let books;
@@ -33,14 +32,6 @@ export const getBookById = async (req, res, next) => {
 export const createBook = async (req, res, next) => {
     const data = req.body;
 
-    const errors = booksValidator.validateCreateData(data);
-    if (errors.length) {
-        return res.status(400).json({
-            status: false,
-            errors,
-        });
-    }
-
     let book;
     try {
         book = await booksService.createBook(data);
@@ -54,14 +45,6 @@ export const createBook = async (req, res, next) => {
 
 export const updateBook = async (req, res, next) => {
     const data = req.body;
-
-    const errors = booksValidator.validateUpdateData(data);
-    if (errors.length) {
-        return res.status(400).json({
-            status: false,
-            errors,
-        });
-    }
 
     let book;
     try {
@@ -90,5 +73,4 @@ export const deleteBook = async  (req, res, next) => {
     } else {
         res.sendStatus(404);
     }
-
 };

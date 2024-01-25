@@ -1,7 +1,7 @@
 const errorHandler = ({error}) => (err, req, res, next) => {
     if (err) {
         if (!res.headersSent) {
-            res.sendStatus(500);
+            res.status(err.status || 500).send(err.message || 'Internal server error');
         }
         error(err);
     }
