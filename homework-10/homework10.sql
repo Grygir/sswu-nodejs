@@ -29,7 +29,7 @@ CREATE TABLE main.employees (
   last_name VARCHAR(255) NOT NULL,
   position_id INT NOT NULL,
   level_id INT NOT NULL,
-  salary NUMERIC(10, 2),
+  salary NUMERIC(10, 2) NOT NULL,
   FOREIGN KEY (position_id) REFERENCES main.positions (id),
   FOREIGN KEY (level_id) REFERENCES main.levels (id)
 );
@@ -37,7 +37,7 @@ CREATE TABLE main.employees (
 CREATE INDEX employee_name_index ON main.employees (first_name, last_name, id);
 
 INSERT INTO main.employees (first_name, last_name, position_id, level_id, salary) VALUES
-  ('Mattie', 'Wang', 1, 1, null),
+  ('Mattie', 'Wang', 1, 1, 10),
   ('Keisha', 'Mckay', 1, 2, 1500),
   ('Isobel', 'Lloyd', 1, 3, 2500),
   ('Virgil', 'Wyatt', 1, 4, 3500),
@@ -109,7 +109,7 @@ CREATE TABLE main.mentors (
   mentee_id INT NOT NULL CHECK ( mentee_id != mentor_id ) UNIQUE,
   FOREIGN KEY (mentor_id) REFERENCES main.employees (id),
   FOREIGN KEY (mentee_id) REFERENCES main.employees (id),
-  UNIQUE (mentor_id, mentee_id)
+  PRIMARY KEY (mentor_id, mentee_id)
 );
 
 INSERT INTO main.mentors (mentor_id, mentee_id) VALUES
@@ -181,8 +181,14 @@ UPDATE main.employees
 SET level_id = 2, salary = 1200
 WHERE first_name = 'Mattie' AND last_name = 'Wang';
 
-DELETE FROM main.employee_projects USING main.employees, main.projects
-WHERE first_name = 'Mattie' AND last_name = 'Wang' AND projects.code = 'GGL';
+DELETE FROM main.employee_projects
+WHERE employee_projects.employee_id IN (
+  SELECT id FROM main.employees
+  WHERE first_name = 'Mattie' AND last_name = 'Wang'
+) AND employee_projects.project_id IN (
+  SELECT id FROM main.projects
+  WHERE projects.code = 'GGL'
+);
 
 INSERT INTO main.employee_projects (employee_id, project_id)
   SELECT employees.id, projects.id FROM main.employees, main.projects
