@@ -11,7 +11,7 @@ db.users.aggregate([
 // 3. Вивести кількість користувачів з прізвищем Kuzmenko
 db.users.aggregate([
     {$match: {lastName: 'Kuzmenko'}},
-    {$group: {_id: '$lastName' , usersCount: {$count: {}}}}
+    {$count: 'lastName'}
 ]);
 
 // 4. Отримати топ-3 найпопулярніших навичок серед користувачів та вивести кількість користувачів,
@@ -34,6 +34,8 @@ db.users.aggregate([
 db.users.aggregate([
     {$match: {pets: {$ne: null}}},
     {$group: {_id: 1, totalPets: {$sum: {$size: '$pets'}}}},
+    // {$unwind: '$pets'},
+    // {$count: 'totalPets'}
 ]);
 
 // 7. Вивести користувачів, які живуть у Ванкувері та володіють JavaScript.
@@ -59,7 +61,7 @@ db.users.aggregate([
 
 // 9. Отримати список користувачів які не люблять жовтий або червоний колір. Вивести їх імʼя, прізвище та адресу
 db.users.aggregate([
-    {$match: {'preferences.color': {$nin: ['yellow', 'black']}}},
+    {$match: {'preferences.color': {$nin: ['yellow', 'red']}}},
     {$project: {_id: 0, firstName: 1, lastName: 1, address: 1}}
 ]);
 
