@@ -1,6 +1,12 @@
 import Book from '../models/book.model.js'
 import Action from '../models/action.model.js'
 
+const actionToBookField = {
+    'purchase': 'bestsellers',
+    'add_to_wishlist': 'mostWanted',
+    'add_to_favourites': 'favourites'
+};
+
 export const addAction = async (actionObj) => {
     let book = await Book.findOne({_id: actionObj.book.id});
     if (!book) {
@@ -9,6 +15,8 @@ export const addAction = async (actionObj) => {
     const action = new Action(actionObj);
     action.book = book._id;
     await action.save();
+    book.$inc(actionToBookField[action.action], 1);
+    await book.save();
     await action.populate('book');
     return action;
 }
@@ -55,7 +63,6 @@ export const recommendBooks = async (userId) => {
         {$match: {$expr: {$gt: [{$size: {$setIntersection: ['$recommendation.book.genres', '$userGenres']}}, 0]}}},
         {$project: {
             _id: '$recommendation.book._id',
-            id: '$recommendation.book.id',
             title: '$recommendation.book.title',
             author: '$recommendation.book.author',
             genres: '$recommendation.book.genres'
@@ -66,25 +73,5 @@ export const recommendBooks = async (userId) => {
 }
 
 export const getSortedBooks = async (sortBy) => {
-    const actionsMap = {
-        'bestsellers': 'purchase',
-        'favourites': 'add_to_wishlist',
-        'mostWanted': 'add_to_favourites'
-    };
-
-    const books = await Book.aggregate([
-        {$lookup: {
-            from: 'actions', localField: '_id', foreignField: 'book', as: 'actions',
-            pipeline: [
-                {$project: {_id: 0, book: 1, action: {$cond: [{$eq: ['$action', actionsMap[sortBy]]}, 1, 0]}}},
-                {$group: {_id: "$book", action: {$sum: '$action'}}},
-                {$project: {_id: 0, action: 1}}
-            ],
-        }},
-        {$unwind: '$actions'},
-        {$sort: {'actions.action': -1}},
-        {$project: {actions: 0}}
-    ]);
-
-    return books.map(bookObj => Book.hydrate(bookObj));
+    return Book.find().sort({ [sortBy]: -1 });
 };
