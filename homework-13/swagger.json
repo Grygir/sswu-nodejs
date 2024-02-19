@@ -1,0 +1,205 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Book Store API",
+    "description": "This is a Book Store API",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Book",
+      "description": "Books management API"
+    }
+  ],
+  "paths": {
+    "/api/actions": {
+      "post": {
+        "tags": ["Actions"],
+        "summary": "Save user action in DB",
+        "description": "Save user action in DB",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Action"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "userId",
+                      "action",
+                      "book"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Action"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "002f9a4f-5607-4757-8768-622484822525"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/books": {
+      "get": {
+        "tags": ["Books"],
+        "summary": "Bestsellers, favourites, most wanted books",
+        "description": "Get bestsellers / users' favourites / most wanted books",
+        "parameters": [
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sorting criteria",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "bestsellers",
+                "favourites",
+                "mostWanted"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/recommendations/{userId}": {
+      "get": {
+        "tags": ["Recommendations"],
+        "summary": "Get recommendations",
+        "description": "Get personal recommendations for the user based on their purchases / likes / wishlists",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Action": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "002f9a4f-5607-4757-8768-622484822525"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["add_to_favourites", "purchase", "add_to_wishlist"]
+          },
+          "book": {
+            "$ref": "#/components/schemas/Book"
+          }
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "002f9a4f-5607-4757-8768-622484822525"
+          },
+          "title": {
+            "type": "string",
+            "example": "Book 1"
+          },
+          "author": {
+            "type": "string",
+            "example": "Author 1"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "fiction"
+            }
+          }
+        }
+      }
+    }
+  }
+}
