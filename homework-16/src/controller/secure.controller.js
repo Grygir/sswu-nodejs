@@ -14,7 +14,7 @@ export const login = async (req, res, next) => {
         return next(err);
     }
 
-    if (user && bcrypt.compare(password, user.passwordHash)) {
+    if (user && await bcrypt.compare(password, user.passwordHash)) {
         let tokens;
         try {
             tokens = await createTokens({ email, id: user.id });

@@ -36,6 +36,22 @@ module.exports = {
     });
 
     await queryInterface.addIndex('users', ['id', 'email']);
+
+    const { Op, where, fn, col } = Sequelize
+    await queryInterface.addConstraint('users', {
+      fields: ['first_name', 'last_name'],
+      type: 'check',
+      where: {
+        [Op.and]: [
+          where(fn('char_length', col('first_name')), {
+            [Op.between]: [2, 80]
+          }),
+          where(fn('char_length', col('last_name')), {
+            [Op.between]: [2, 80]
+          })
+        ]
+      }
+    });
   },
   async down(queryInterface) {
     await queryInterface.dropTable('users');
