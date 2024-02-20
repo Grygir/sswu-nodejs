@@ -484,7 +484,7 @@
           "year": {
             "type": "integer",
             "maximum": 2100,
-            "minimum": 1900,
+            "minimum": 1800,
             "nullable": true,
             "example": 2024
           }

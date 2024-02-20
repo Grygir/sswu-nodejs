@@ -37,13 +37,21 @@ module.exports = {
       }
     });
 
+    const { Op, where, fn, col } = Sequelize
     await queryInterface.addConstraint('reviews', {
-      fields: ['rating'],
+      fields: ['title', 'rating'],
       type: 'check',
       where: {
-        rating: {
-          [Sequelize.Op.between]: [1, 5]
-        }
+        [Op.and]: [
+          where(fn('char_length', col('title')), {
+            [Op.between]: [3, 140]
+          }),
+          {
+            rating: {
+              [Sequelize.Op.between]: [1, 5]
+            }
+          }
+        ]
       }
     });
   },

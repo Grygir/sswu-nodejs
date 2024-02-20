@@ -22,6 +22,19 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+
+    const { Op, where, fn, col } = Sequelize
+    await queryInterface.addConstraint('authors', {
+      fields: ['name'],
+      type: 'check',
+      where: {
+        [Op.and]: [
+          where(fn('char_length', col('name')), {
+            [Op.between]: [3, 140]
+          })
+        ]
+      }
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('authors');
