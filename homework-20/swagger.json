@@ -21,6 +21,10 @@
     {
       "name": "Author",
       "description": "Author management API"
+    },
+    {
+      "name": "Orders",
+      "description": "Bookstore Orders management API"
     }
   ],
   "paths": {
@@ -368,7 +372,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "books": {
+                    "orderBooks": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Book"
@@ -699,6 +703,147 @@
           }
         }
       }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "List of current users' Orders",
+        "description": "Get list of all orders for a current user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Orders offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Order"
+                      }
+                    },
+                    "ordersCount": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create a new Order for a current user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewOrder"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the order",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Find order by id",
+        "description": "Returns an order details",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "Order is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -798,14 +943,7 @@
       "Book": {
         "allOf": [
           {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
-              }
-            }
+            "$ref": "#/components/schemas/Book.id"
           },
           {
             "$ref": "#/components/schemas/Book.title"
@@ -826,6 +964,16 @@
             "$ref": "#/components/schemas/Book.rating"
           }
         ]
+      },
+      "Book.id": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
+          }
+        }
       },
       "Book.title": {
         "type": "object",
@@ -860,9 +1008,9 @@
             "type": "array",
             "items": {
               "type": "string",
-              "uniqueItems": true,
-              "example": [ "Robert Louis Stevenson" ]
-            }
+              "uniqueItems": true
+            },
+            "example": [ "Robert Louis Stevenson" ]
           }
         }
       },
@@ -986,6 +1134,83 @@
               "$ref": "#/components/schemas/NewReview"
             }
           ]
+      },
+      "NewOrder": {
+        "type": "object",
+        "properties": {
+          "orderBooks": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Book.id"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "quantity": {
+                      "type": "integer",
+                      "example": "1",
+                      "maximum": 10,
+                      "minimum": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "example": [
+              {
+                "bookId": "9f38d8b1-28eb-4d62-bae8-cedb6946827e",
+                "quantity": 1
+              },
+              {
+                "bookId": "82c4d1c2-56db-4999-bec7-990d5452516e",
+                "quantity": 7
+              }
+            ]
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "5e5b156f-1143-4b8e-9ad4-bca93fd2fd96"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-10T15:25:22.617Z"
+          },
+          "orderBooks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "book": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Book.id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Book.title"
+                    }
+                  ]
+                },
+                "quantity": {
+                  "type": "integer",
+                  "example": "1",
+                  "maximum": 10,
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

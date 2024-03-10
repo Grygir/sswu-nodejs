@@ -19,6 +19,12 @@ module.exports = (sequelize) => {
         },
         as: 'authorIds'
       });
+      this.hasOne(models.Stock, {
+        foreignKey: {
+          name: 'bookId'
+        },
+        as: 'stock'
+      });
     }
 
     toJSON() {

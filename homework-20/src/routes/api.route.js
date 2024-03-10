@@ -1,6 +1,7 @@
 import express from 'express';
 import booksRouter from './books.route.js';
 import authorsRouter from './authors.route.js';
+import ordersRouter from './orders.route.js';
 import usersRouter from './users.route.js';
 import openApiValidatorMiddleware from '../middleware/openapi-validator.middleware.js';
 import * as secureController from '../controller/secure.controller.js';
@@ -16,5 +17,6 @@ router.post('/logout', jwtAuth, secureController.logout)
 router.post('/token', secureController.token)
 router.use('/books', booksRouter);
 router.use('/authors', authorsRouter);
+router.use('/orders', ordersRouter);
 
 export default router;

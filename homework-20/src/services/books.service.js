@@ -1,6 +1,6 @@
 import models from '../models/index.js';
 
-const {Book, Review, Author, BookAuthor, sequelize, Sequelize} = models;
+const {Book, Review, Author, BookAuthor, Stock, sequelize, Sequelize} = models;
 
 const getBookExtendedQuery = () => {
     return {
@@ -64,10 +64,18 @@ export const createBook = async (data) => {
 
         delete data.authors;
 
-        const book = await Book.create(data, {
+        const book = await Book.create({
+            stock: {
+                quantity: 0
+            },
+            ...data
+        }, {
             include: [{
                 model: Review,
                 as: 'reviews'
+            }, {
+                model: Stock,
+                as: 'stock'
             }],
             transaction
         });
