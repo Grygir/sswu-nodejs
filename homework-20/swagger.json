@@ -1,0 +1,992 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Book Store API",
+    "description": "This is a Book Store API",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Users authorization API"
+    },
+    {
+      "name": "User",
+      "description": "Users of Book Store management API"
+    },
+    {
+      "name": "Book",
+      "description": "Books management API"
+    },
+    {
+      "name": "Author",
+      "description": "Author management API"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Authorize user",
+        "description": "Get access and refresh tokens",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Use only strong passwords",
+                    "example": "cB{9Ih?(9K5j"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/tokens"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "User is missing or password is not valid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Revoke user authorization",
+        "description": "Revoke access and refresh for user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Refresh token",
+        "description": "Get access and refresh tokens",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTcwNzU4MTgwMywiZXhwIjoxNzIzMTMzODAzfQ.NbeKVAKsBzzWJGTliyhrRz-wPAatkBSM4pNuQy-mX7Y"
+                  }
+                },
+                "required": [
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/tokens"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Add a new user",
+        "description": "Add a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewUser"
+                  },
+                  {
+                    "$ref": "#/components/schemas/User.password"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "firstName",
+                      "lastName",
+                      "email",
+                      "password"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the user",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Find users by id",
+        "description": "Return single user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "User is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update User by id",
+        "description": "Updates an User",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewUser"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete author by id",
+        "description": "Deletes an author",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/books": {
+      "get": {
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Title of the book",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Books offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": ["Book"],
+        "summary": "List of all Books",
+        "description": "Get list of all books",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "books": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Book"
+                      }
+                    },
+                    "booksCount": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Book"],
+        "summary": "Add a new book to the store",
+        "description": "Add a new book to the store",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewBook"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "reviews": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/NewReview"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": ["title", "authors", "price"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/books/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the book",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Book"],
+        "summary": "Find book by id",
+        "description": "Returns a single book",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/authors": {
+      "get": {
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the author",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Authors offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": ["Author"],
+        "summary": "List of all Authors",
+        "description": "Get list of all authors",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Author"
+                      }
+                    },
+                    "authorsCount": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Author"],
+        "summary": "Add a new author",
+        "description": "Add a new author",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewAuthor"
+                  },
+                  {
+                    "type": "object",
+                    "required": ["name"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/authors/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the author",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Author"],
+        "summary": "Find author by id",
+        "description": "Return single author",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Author"],
+        "summary": "Update author by id",
+        "description": "Updates an author",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewAuthor"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Author is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Author"],
+        "summary": "Delete author by id",
+        "description": "Deletes an author",
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Author is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/authors/{id}/books": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the author",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Book"],
+        "summary": "Find all books by author id",
+        "description": "Returns all books associated with the author",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Access token is missing or invalid"
+      }
+    },
+    "schemas": {
+      "NewUser": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "email": {
+            "type": "string",
+            "example": "doe@example.com"
+          }
+        }
+      },
+      "User": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "708b8f84-bd94-447d-91ff-3c8339a15345"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/NewUser"
+          }
+        ]
+      },
+      "User.password": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Use only strong passwords",
+            "example": "cB{9Ih?(9K5j"
+          }
+        }
+      },
+      "tokens": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTcwNzU4MTgwMywiZXhwIjoxNzA3NTg1NDAzfQ.28IoFQn_nLQ3kYSdPJXBqow6X1SA0qU0gRIIIkueb1w"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTcwNzU4MTgwMywiZXhwIjoxNzIzMTMzODAzfQ.NbeKVAKsBzzWJGTliyhrRz-wPAatkBSM4pNuQy-mX7Y"
+          }
+        }
+      },
+      "NewBook": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Book.title"
+          },
+          {
+            "$ref": "#/components/schemas/Book.authors"
+          },
+          {
+            "$ref": "#/components/schemas/Book.price"
+          },
+          {
+            "$ref": "#/components/schemas/Book.year"
+          },
+          {
+            "$ref": "#/components/schemas/Book.reviews"
+          }
+        ]
+      },
+      "Book": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/Book.title"
+          },
+          {
+            "$ref": "#/components/schemas/Book.price"
+          },
+          {
+            "$ref": "#/components/schemas/Book.year"
+          },
+          {
+            "$ref": "#/components/schemas/Book.authorsList"
+          },
+          {
+            "$ref": "#/components/schemas/Book.totalReviews"
+          },
+          {
+            "$ref": "#/components/schemas/Book.rating"
+          }
+        ]
+      },
+      "Book.title": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "The Black Arrow",
+            "minLength": 3,
+            "maxLength": 140
+          }
+        }
+      },
+      "Book.authors": {
+        "type": "object",
+        "properties": {
+          "authors": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "uniqueItems": true,
+              "allOf": [{
+                  "$ref": "#/components/schemas/NewAuthor"
+              }]
+            }
+          }
+        }
+      },
+      "Book.authorsList": {
+        "type": "object",
+        "properties": {
+          "authorsList": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "uniqueItems": true,
+              "example": [ "Robert Louis Stevenson" ]
+            }
+          }
+        }
+      },
+      "Book.price": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "minimum": 1,
+            "example": 49.99
+          }
+        }
+      },
+      "Book.year": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100,
+            "minimum": 1800,
+            "nullable": true,
+            "example": 2024
+          }
+        }
+      },
+      "Book.reviews": {
+        "type": "object",
+        "properties": {
+          "reviews": {
+            "type": "array",
+            "items": {
+              "allOf": [{
+                "$ref": "#/components/schemas/NewReview"
+              }]
+            }
+          }
+        }
+      },
+      "Book.totalReviews": {
+        "type": "object",
+        "properties": {
+          "totalReviews": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 7
+          }
+        }
+      },
+      "Book.rating": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 4.9
+          }
+        }
+      },
+      "NewAuthor": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Robert Louis Stevenson",
+            "minLength": 3,
+            "maxLength": 140
+          }
+        }
+      },
+      "Author": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "708b8f84-bd94-447d-91ff-3c8339a15345"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/NewAuthor"
+          }
+        ]
+      },
+      "NewReview": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Good book",
+            "minLength": 3,
+            "maxLength": 140
+          },
+          "review": {
+            "type": "string",
+            "example": "A very interesting book that will not leave anyone indifferent"
+          },
+          "rating": {
+            "type": "integer",
+            "example": 5,
+            "maximum": 5,
+            "minimum": 1
+          }
+        }
+      },
+      "Review": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": "10"
+                }
+              }
+            },
+            {
+              "$ref": "#/components/schemas/NewReview"
+            }
+          ]
+      }
+    }
+  }
+}
