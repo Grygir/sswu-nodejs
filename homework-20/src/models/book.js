@@ -7,6 +7,10 @@ module.exports = (sequelize) => {
         through: 'BookAuthor',
         as: 'authors'
       });
+      this.belongsToMany(models.Genre, {
+        through: 'BookGenre',
+        as: 'genres'
+      });
       this.hasMany(models.Review, {
         foreignKey: {
           name: 'bookId'

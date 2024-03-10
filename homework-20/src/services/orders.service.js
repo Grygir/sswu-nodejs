@@ -1,12 +1,9 @@
 import models from '../models/index.js';
 
-const {Order, OrderBook, Book, sequelize} = models;
+const {Order, OrderBook, Book, Author, Genre, sequelize} = models;
 
 const getOrderExtendedQuery = () => {
     return {
-        attributes: {
-            exclude: ['userId']
-        },
         include: [{
             model: OrderBook,
             as: 'orderBooks',
@@ -16,21 +13,48 @@ const getOrderExtendedQuery = () => {
             include: [{
                 model: Book,
                 as: 'book',
-                attributes: ['id', 'title']
+                attributes: {
+                    exclude: ['price', 'year'],
+                    include: [
+                        'id',
+                        'title',
+                        [sequelize.fn('json_agg', sequelize.fn('DISTINCT', sequelize.col('orderBooks.book.genres.name'))), 'genresList'],
+                        [sequelize.fn('json_agg', sequelize.fn('DISTINCT', sequelize.col('orderBooks.book.authors.name'))), 'authorsList'],
+                    ]
+                },
+                include: [{
+                    model: Author,
+                    as: 'authors',
+                    through: {attributes: []},
+                    attributes: []
+                }, {
+                    model: Genre,
+                    as: 'genres',
+                    through: {attributes: []},
+                    attributes: []
+                }]
             }]
         }],
+        group: ['Order.id', 'orderBooks.id', 'orderBooks.book.id'],
+        subQuery: false,
     }
 }
 
 export const getUserOrders = async ({offset = 0, ...where}) => {
-    const {rows, count} = await Order.findAndCountAll({
+    const orders = await Order.findAll({
         ...getOrderExtendedQuery(),
         where,
         limit: 10,
         offset
     });
 
-    return { orders: rows, ordersCount: count }
+    const ordersCount = await Order.count({
+        where,
+        limit: 10,
+        offset
+    })
+
+    return { orders, ordersCount }
 };
 
 export const getOrderById = async (orderId, where) => {
@@ -55,7 +79,7 @@ export const createOrder = async (data) => {
         return result
     }, []);
 
-    return await sequelize.transaction(async transaction => {
+    return sequelize.transaction(async transaction => {
         const order = await Order.create(data, {
             transaction,
             include: [{

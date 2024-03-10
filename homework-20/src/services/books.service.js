@@ -1,12 +1,17 @@
 import models from '../models/index.js';
 
-const {Book, Review, Author, BookAuthor, Stock, sequelize, Sequelize} = models;
+const {Book, Review, Author, BookAuthor, Stock, Genre, sequelize, Sequelize} = models;
 
 const getBookExtendedQuery = () => {
     return {
         include: [{
             model: Author,
             as: 'authors',
+            through: {attributes: []},
+            attributes: []
+        },{
+            model: Genre,
+            as: 'genres',
             through: {attributes: []},
             attributes: []
         }, {
@@ -17,6 +22,7 @@ const getBookExtendedQuery = () => {
         attributes: {
             exclude: ['createdAt', 'updatedAt'],
             include: [
+                [sequelize.fn('json_agg', sequelize.fn('DISTINCT', sequelize.col('genres.name'))), 'genresList'],
                 [sequelize.fn('json_agg', sequelize.fn('DISTINCT', sequelize.col('authors.name'))), 'authorsList'],
                 [sequelize.cast(sequelize
                     .fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('reviews.id'))), 'INTEGER'), 'totalReviews'],
@@ -54,15 +60,23 @@ export const getBookById = async (bookId) => {
 
 export const createBook = async (data) => {
     const book = await sequelize.transaction(async transaction => {
-        const result = await Promise.all(
-            data.authors
-                .map(author => Author.findOrCreate({where: author, transaction}))
-        );
-        const authors = result
+        const [authorsResult, genresResult] = await Promise.all([
+            Promise.all(data.authors
+                .map(author => Author.findOrCreate({where: author, transaction}))),
+            Promise.all(data.genres
+                .map(genre => Genre.findOrCreate({where: {name: genre.name.toLowerCase()}, transaction})))
+        ]);
+
+        const authors = authorsResult
             .map(([author]) => author)
             .filter((author, i, list) => list.findIndex(item => item.id === author.id) === i);
 
+        const genres = genresResult
+            .map(([genre]) => genre)
+            .filter((genre, i, list) => list.findIndex(item => item.id === genre.id) === i);
+
         delete data.authors;
+        delete data.genres;
 
         const book = await Book.create({
             stock: {
@@ -81,6 +95,8 @@ export const createBook = async (data) => {
         });
 
         await book.setAuthors(authors, { transaction });
+        await book.setGenres(genres, { transaction });
+
         return book;
     });
 
