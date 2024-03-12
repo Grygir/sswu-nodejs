@@ -1,4 +1,5 @@
 import * as ordersService from '../services/orders.service.js';
+import * as booksRecommendationService from '../services/books.recommendation.service.js'
 
 export const getUserOrders = async (req, res, next) => {
     let orders;
@@ -32,7 +33,15 @@ export const createOrder = async (req, res, next) => {
     let order;
     try {
         order = await ordersService.createOrder({ ...data, userId: req.user.id });
-        // @todo call actions
+
+        await Promise.all(order.orderBooks.map(orderBook => {
+            const { id, title, genresList: genres, authorsList: authors } = orderBook.book.toJSON();
+            return booksRecommendationService.addAction({
+                userId: req.user.id,
+                action: 'purchase',
+                book: { id, title, genres, authors }
+            });
+        }));
     } catch (err) {
         if (err.message.indexOf('"stock" violates check constraint') !== -1) {
             res.status(400).send('Request book is out of stock');

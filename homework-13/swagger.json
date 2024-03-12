@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Book Store API",
-    "description": "This is a Book Store API",
+    "title": "Book Store recommendations API",
+    "description": "This is a Book Store recommendations API",
     "version": "1.0.0"
   },
   "tags": [
@@ -187,9 +187,12 @@
             "type": "string",
             "example": "Book 1"
           },
-          "author": {
-            "type": "string",
-            "example": "Author 1"
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Author 1"
+            }
           },
           "genres": {
             "type": "array",

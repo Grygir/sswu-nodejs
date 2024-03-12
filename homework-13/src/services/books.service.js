@@ -64,7 +64,7 @@ export const recommendBooks = async (userId) => {
         {$project: {
             _id: '$recommendation.book._id',
             title: '$recommendation.book.title',
-            author: '$recommendation.book.author',
+            authors: '$recommendation.book.authors',
             genres: '$recommendation.book.genres'
         }}
     ]);
