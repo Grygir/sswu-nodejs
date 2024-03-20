@@ -8,11 +8,11 @@
   "tags": [
     {
       "name": "Auth",
-      "description": "Users authorization API"
+      "description": "User authorization API"
     },
     {
       "name": "User",
-      "description": "Users of Book Store management API"
+      "description": "Book Store Users management API"
     },
     {
       "name": "Book",
@@ -20,11 +20,11 @@
     },
     {
       "name": "Author",
-      "description": "Author management API"
+      "description": "Authors management API"
     },
     {
-      "name": "Orders",
-      "description": "Bookstore Orders management API"
+      "name": "Order",
+      "description": "Book Store Orders management API"
     }
   ],
   "paths": {
@@ -165,8 +165,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Add a new user",
-        "description": "Add a new user",
+        "summary": "Add a new User",
+        "description": "Add a new User",
         "requestBody": {
           "required": true,
           "content": {
@@ -233,8 +233,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Find users by id",
-        "description": "Return single user",
+        "summary": "Find User by id",
+        "description": "Return single User",
         "security": [
           {
             "bearerAuth": []
@@ -312,8 +312,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Delete author by id",
-        "description": "Deletes an author",
+        "summary": "Delete User by id",
+        "description": "Deletes an User",
         "security": [
           {
             "bearerAuth": []
@@ -394,8 +394,8 @@
       },
       "post": {
         "tags": ["Book"],
-        "summary": "Add a new book to the store",
-        "description": "Add a new book to the store",
+        "summary": "Add a new Book to the store",
+        "description": "Add a new Book to the store",
         "requestBody": {
           "required": true,
           "content": {
@@ -460,8 +460,8 @@
       ],
       "get": {
         "tags": ["Book"],
-        "summary": "Find book by id",
-        "description": "Returns a single book",
+        "summary": "Find Book by id",
+        "description": "Returns a single Book",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -535,8 +535,8 @@
       },
       "post": {
         "tags": ["Author"],
-        "summary": "Add a new author",
-        "description": "Add a new author",
+        "summary": "Add a new Author",
+        "description": "Add a new Author",
         "requestBody": {
           "required": true,
           "content": {
@@ -590,8 +590,8 @@
       ],
       "get": {
         "tags": ["Author"],
-        "summary": "Find author by id",
-        "description": "Return single author",
+        "summary": "Find Author by id",
+        "description": "Return single Author",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -613,8 +613,8 @@
       },
       "patch": {
         "tags": ["Author"],
-        "summary": "Update author by id",
-        "description": "Updates an author",
+        "summary": "Update Author by id",
+        "description": "Updates an Author",
         "requestBody": {
           "required": true,
           "content": {
@@ -646,8 +646,8 @@
       },
       "delete": {
         "tags": ["Author"],
-        "summary": "Delete author by id",
-        "description": "Deletes an author",
+        "summary": "Delete Author by id",
+        "description": "Deletes an Author",
         "responses": {
           "204": {
             "description": "Successful operation"
@@ -679,8 +679,8 @@
       ],
       "get": {
         "tags": ["Book"],
-        "summary": "Find all books by author id",
-        "description": "Returns all books associated with the author",
+        "summary": "Find all Books by Author id",
+        "description": "Returns all Books associated with the Author",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -706,9 +706,9 @@
     },
     "/api/orders": {
       "get": {
-        "tags": ["Orders"],
-        "summary": "List of current users' Orders",
-        "description": "Get list of all orders for a current user",
+        "tags": ["Order"],
+        "summary": "List of current User's Orders",
+        "description": "Get list of all orders for a current User",
         "security": [
           {
             "bearerAuth": []
@@ -756,8 +756,8 @@
         }
       },
       "post": {
-        "tags": ["Orders"],
-        "summary": "Create a new Order for a current user",
+        "tags": ["Order"],
+        "summary": "Create a new Order for a current User",
         "security": [
           {
             "bearerAuth": []
@@ -814,9 +814,9 @@
         }
       ],
       "get": {
-        "tags": ["Orders"],
-        "summary": "Find order by id",
-        "description": "Returns an order details",
+        "tags": ["Order"],
+        "summary": "Find Order by id",
+        "description": "Returns an Order details",
         "security": [
           {
             "bearerAuth": []
@@ -841,6 +841,20 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Order"],
+        "summary": "Update an Order by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "501": {
+            "description": "Not Implemented"
           }
         }
       }
