@@ -3,7 +3,7 @@ module.exports = {
     username: 'postgres',
     password: 'postgres',
     database: 'bookshop_sequelize',
-    host: '127.0.0.1',
+    host: process.env.POSTGRES_HOST || '127.0.0.1',
     dialect: 'postgres'
   },
   test: {

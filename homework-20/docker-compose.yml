@@ -1,0 +1,65 @@
+version: '3.8'
+name: bookstore
+
+services:
+    postgresdb:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: postgres
+            PGDATA: /var/lib/postgresql/data/pgdata
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - postgres_network
+
+    mongodb:
+        image: mongo
+        ports:
+            - "27018:27017"
+        volumes:
+            - mongodb_data:/data/db
+            - mongodb_config:/data/configdb
+        networks:
+            - mongodb_network
+
+    recommendations:
+        image: recommendations-app
+        build: ../homework-13/.
+        ports:
+            - "8081:8080"
+        environment:
+            - MONGODB_HOST=mongodb
+        networks:
+            - mongodb_network
+            - recommendations_network
+        depends_on:
+            - mongodb
+
+    bookstore-app:
+        image: bookstore-app
+        build: .
+        ports:
+            - "8080:8080"
+        environment:
+            - POSTGRES_HOST=postgresdb
+            - RECOMMENDATIONS_HOST=recommendations
+            - RECOMMENDATIONS_PORT=8080
+        networks:
+            - postgres_network
+            - recommendations_network
+        depends_on:
+            - postgresdb
+            - recommendations
+
+networks:
+    mongodb_network:
+    recommendations_network:
+    postgres_network:
+
+volumes:
+    mongodb_data:
+    mongodb_config:
+    postgres_data:

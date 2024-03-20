@@ -8,11 +8,11 @@
   "tags": [
     {
       "name": "Auth",
-      "description": "Users authorization API"
+      "description": "User authorization API"
     },
     {
       "name": "User",
-      "description": "Users of Book Store management API"
+      "description": "Book Store Users management API"
     },
     {
       "name": "Book",
@@ -20,7 +20,11 @@
     },
     {
       "name": "Author",
-      "description": "Author management API"
+      "description": "Authors management API"
+    },
+    {
+      "name": "Order",
+      "description": "Book Store Orders management API"
     }
   ],
   "paths": {
@@ -161,8 +165,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Add a new user",
-        "description": "Add a new user",
+        "summary": "Add a new User",
+        "description": "Add a new User",
         "requestBody": {
           "required": true,
           "content": {
@@ -229,8 +233,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Find users by id",
-        "description": "Return single user",
+        "summary": "Find User by id",
+        "description": "Return single User",
         "security": [
           {
             "bearerAuth": []
@@ -308,8 +312,8 @@
         "tags": [
           "User"
         ],
-        "summary": "Delete author by id",
-        "description": "Deletes an author",
+        "summary": "Delete User by id",
+        "description": "Deletes an User",
         "security": [
           {
             "bearerAuth": []
@@ -368,7 +372,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "books": {
+                    "orderBooks": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Book"
@@ -390,8 +394,8 @@
       },
       "post": {
         "tags": ["Book"],
-        "summary": "Add a new book to the store",
-        "description": "Add a new book to the store",
+        "summary": "Add a new Book to the store",
+        "description": "Add a new Book to the store",
         "requestBody": {
           "required": true,
           "content": {
@@ -456,8 +460,8 @@
       ],
       "get": {
         "tags": ["Book"],
-        "summary": "Find book by id",
-        "description": "Returns a single book",
+        "summary": "Find Book by id",
+        "description": "Returns a single Book",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -531,8 +535,8 @@
       },
       "post": {
         "tags": ["Author"],
-        "summary": "Add a new author",
-        "description": "Add a new author",
+        "summary": "Add a new Author",
+        "description": "Add a new Author",
         "requestBody": {
           "required": true,
           "content": {
@@ -586,8 +590,8 @@
       ],
       "get": {
         "tags": ["Author"],
-        "summary": "Find author by id",
-        "description": "Return single author",
+        "summary": "Find Author by id",
+        "description": "Return single Author",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -609,8 +613,8 @@
       },
       "patch": {
         "tags": ["Author"],
-        "summary": "Update author by id",
-        "description": "Updates an author",
+        "summary": "Update Author by id",
+        "description": "Updates an Author",
         "requestBody": {
           "required": true,
           "content": {
@@ -642,8 +646,8 @@
       },
       "delete": {
         "tags": ["Author"],
-        "summary": "Delete author by id",
-        "description": "Deletes an author",
+        "summary": "Delete Author by id",
+        "description": "Deletes an Author",
         "responses": {
           "204": {
             "description": "Successful operation"
@@ -675,8 +679,8 @@
       ],
       "get": {
         "tags": ["Book"],
-        "summary": "Find all books by author id",
-        "description": "Returns all books associated with the author",
+        "summary": "Find all Books by Author id",
+        "description": "Returns all Books associated with the Author",
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -696,6 +700,161 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": ["Order"],
+        "summary": "List of current User's Orders",
+        "description": "Get list of all orders for a current User",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Orders offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Order"
+                      }
+                    },
+                    "ordersCount": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Order"],
+        "summary": "Create a new Order for a current User",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewOrder"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of the order",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": ["Order"],
+        "summary": "Find Order by id",
+        "description": "Returns an Order details",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "Order is not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Order"],
+        "summary": "Update an Order by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "501": {
+            "description": "Not Implemented"
           }
         }
       }
@@ -739,19 +898,22 @@
       "User": {
         "allOf": [
           {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "708b8f84-bd94-447d-91ff-3c8339a15345"
-              }
-            }
+            "$ref": "#/components/schemas/User.id"
           },
           {
             "$ref": "#/components/schemas/NewUser"
           }
         ]
+      },
+      "User.id": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "708b8f84-bd94-447d-91ff-3c8339a15345"
+          }
+        }
       },
       "User.password": {
         "type": "object",
@@ -785,6 +947,9 @@
             "$ref": "#/components/schemas/Book.authors"
           },
           {
+            "$ref": "#/components/schemas/Book.genres"
+          },
+          {
             "$ref": "#/components/schemas/Book.price"
           },
           {
@@ -798,14 +963,7 @@
       "Book": {
         "allOf": [
           {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
-              }
-            }
+            "$ref": "#/components/schemas/Book.id"
           },
           {
             "$ref": "#/components/schemas/Book.title"
@@ -820,12 +978,25 @@
             "$ref": "#/components/schemas/Book.authorsList"
           },
           {
+            "$ref": "#/components/schemas/Book.genresList"
+          },
+          {
             "$ref": "#/components/schemas/Book.totalReviews"
           },
           {
             "$ref": "#/components/schemas/Book.rating"
           }
         ]
+      },
+      "Book.id": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
+          }
+        }
       },
       "Book.title": {
         "type": "object",
@@ -860,9 +1031,37 @@
             "type": "array",
             "items": {
               "type": "string",
+              "uniqueItems": true
+            },
+            "example": [ "Robert Louis Stevenson" ]
+          }
+        }
+      },
+      "Book.genres": {
+        "type": "object",
+        "properties": {
+          "genres": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
               "uniqueItems": true,
-              "example": [ "Robert Louis Stevenson" ]
+              "allOf": [{
+                "$ref": "#/components/schemas/NewGenre"
+              }]
             }
+          }
+        }
+      },
+      "Book.genresList": {
+        "type": "object",
+        "properties": {
+          "genresList": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "uniqueItems": true
+            },
+            "example": [ "historical", "adventure", "romance novel" ]
           }
         }
       },
@@ -950,6 +1149,33 @@
           }
         ]
       },
+      "NewGenre": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "adventure",
+            "minLength": 3,
+            "maxLength": 140
+          }
+        }
+      },
+      "Genre": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": "77"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/NewGenre"
+          }
+        ]
+      },
       "NewReview": {
         "type": "object",
         "properties": {
@@ -986,6 +1212,101 @@
               "$ref": "#/components/schemas/NewReview"
             }
           ]
+      },
+      "NewOrder": {
+        "type": "object",
+        "properties": {
+          "orderBooks": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "bookId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "708b8f84-bd94-447d-91ff-3c8339a15859"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "quantity": {
+                      "type": "integer",
+                      "example": "1",
+                      "maximum": 10,
+                      "minimum": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "example": [
+              {
+                "bookId": "9f38d8b1-28eb-4d62-bae8-cedb6946827e",
+                "quantity": 1
+              },
+              {
+                "bookId": "82c4d1c2-56db-4999-bec7-990d5452516e",
+                "quantity": 7
+              }
+            ]
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "5e5b156f-1143-4b8e-9ad4-bca93fd2fd96"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "002f9a4f-5607-4757-8768-622484822525"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-10T15:25:22.617Z"
+          },
+          "orderBooks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "book": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Book.id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Book.title"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Book.authorsList"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Book.genresList"
+                    }
+                  ]
+                },
+                "quantity": {
+                  "type": "integer",
+                  "example": "1",
+                  "maximum": 10,
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

@@ -1,5 +1,11 @@
 # Homework-20
 
+## As Docker container
+```shell
+docker compose up -d
+```
+
+## Local run
 Install npm packages
 ```shell
 npm i
